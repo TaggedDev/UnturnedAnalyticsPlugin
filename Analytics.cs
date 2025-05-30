@@ -6,40 +6,34 @@ using Cysharp.Threading.Tasks;
 using OpenMod.Unturned.Plugins;
 using OpenMod.API.Plugins;
 
-// For more, visit https://openmod.github.io/openmod-docs/devdoc/guides/getting-started.html
-
 [assembly: PluginMetadata("Scitalis.Analytics", DisplayName = "Player Analytics Logging")]
 namespace Scitalis.Analytics
 {
-    public class MyOpenModPlugin : OpenModUnturnedPlugin
+    public class Analytics : OpenModUnturnedPlugin
     {
-        private readonly IConfiguration m_Configuration;
-        private readonly IStringLocalizer m_StringLocalizer;
-        private readonly ILogger<MyOpenModPlugin> m_Logger;
+        private readonly IConfiguration _configuration;
+        private readonly IStringLocalizer _stringLocalizer;
+        private readonly ILogger<Analytics> _logger;
 
-        public MyOpenModPlugin(
+        public Analytics(
             IConfiguration configuration,
             IStringLocalizer stringLocalizer,
-            ILogger<MyOpenModPlugin> logger,
+            ILogger<Analytics> logger,
             IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            m_Configuration = configuration;
-            m_StringLocalizer = stringLocalizer;
-            m_Logger = logger;
+            _configuration = configuration;
+            _stringLocalizer = stringLocalizer;
+            _logger = logger;
         }
 
         protected override async UniTask OnLoadAsync()
         {
-            // await UniTask.SwitchToMainThread(); uncomment if you have to access Unturned or UnityEngine APIs
-            m_Logger.LogInformation("Hello World!");
-
-            // await UniTask.SwitchToThreadPool(); // you can switch back to a different thread
+            _logger.LogInformation("Hello World!");
         }
 
         protected override async UniTask OnUnloadAsync()
         {
-            // await UniTask.SwitchToMainThread(); uncomment if you have to access Unturned or UnityEngine APIs
-            m_Logger.LogInformation(m_StringLocalizer["plugin_events:plugin_stop"]);
+            _logger.LogInformation(_stringLocalizer["plugin_events:plugin_stop"]);
         }
     }
 }
