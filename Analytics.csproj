@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
 	<PackageId>Scitalis.Analytics</PackageId>
-	<PackageDescription>Logging plugin for deeper data analytics and data science</PackageDescription>
+	<PackageDescription>Work in progress. Plugin used for logging player activity for deeper data analytics and data science</PackageDescription>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>openmod openmod-plugin unturned</PackageTags>
 	<PackageAuthor>Scitalis</PackageAuthor>
@@ -14,9 +14,9 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
-    <Version>0.1.0</Version>
-    <InformationalVersion>0.1.0</InformationalVersion>
-    <PackageVersion>0.1.0</PackageVersion>
+    <Version>0.1.9</Version>
+	<InformationalVersion>0.1.9</InformationalVersion>
+    <PackageVersion>0.1.9</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,8 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="config.yaml" />
+    <EmbeddedResource Include="Configuration\config.yaml" />
     <EmbeddedResource Include="translations.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Localization\" />
   </ItemGroup>
 
   <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
