@@ -47,7 +47,7 @@ namespace Scitalis.Analytics.Logging
             {
                 ICollection<UnturnedUser> users = _unturnedUsers.GetOnlineUsers();
                 if (users.Count != 0)
-                    await _writer.AppendPlayerPositionToFile(users);
+                    await _writer.AppendToPlayerPositionFile(users);
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
         }

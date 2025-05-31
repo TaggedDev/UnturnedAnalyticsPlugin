@@ -1,31 +1,93 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using OpenMod.API.Ioc;
-using OpenMod.Unturned.Users;
-using UnityEngine;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Vector3 = System.Numerics.Vector3;
+using OpenMod.Unturned.Players.Life.Events;
+using System.Collections.Generic;
+using Scitalis.Analytics.Models;
+using OpenMod.Unturned.Users;
+using System.Threading.Tasks;
+using OpenMod.API.Ioc;
+using System.Text;
+using UnityEngine;
+using System.IO;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Scitalis.Analytics.FileWriter
 {
-    public struct PlayerPositionRecord
-    {
-        public string TimeStamp;
-        public string PlayerName;
-        public string PlayerID;
-        public Vector3 PlayerPosition;
-    }
-    
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton)]
     public class CsvWriterService : IWriterService
     {
-        private const string PositionHeaderLine = "Timestamp,PlayerName,PlayerID,PositionX,PositionY,PositionZ";
         private const string PositionFileName = "player_position.csv";
+        private const string CombatFileName = "player_combat.csv";
+        
+        public async Task AppendToPlayerPositionFile(ICollection<UnturnedUser> users)
+        {
+            PlayerPositionRecord[] records = PlayerPositionRecords(users);
+            await AppendRecordsToFileAsync(records, PositionFileName);
+        }
+        
+        public async Task AppendToDamageFile(UnturnedPlayerDamagedEvent @event)
+        {
+            KillFeedRecord record = new KillFeedRecord
+            {
+                KillerID = @event.Killer,
+                VictimID = @event.Player.SteamId,
+                HitLimb = @event.Limb,
+                DamageSource = @event.DamageSource,
+                DamageAmount = @event.DamageAmount,
+                Cause = @event.Cause,
+                Arguments = @event.Arguments,
+                Data = @event.Data,
+            };
 
-        private static async Task AppendRecordsToFileAsync(PlayerPositionRecord[] records, string fileName = "PlayerPositions.csv")
+            await AppendRecordsToFileAsync(record, CombatFileName);
+        }
+        
+        private static async Task AppendRecordsToFileAsync<T>(T[] records, string fileName) where T : struct
+        {
+            string pluginPath = Path.Combine(Application.dataPath, "Plugins");
+            string logsFolder = Path.Combine(pluginPath, "Logs");
+            string filePath = Path.Combine(logsFolder, fileName);
+            
+            // Create directory if it doesn't exist
+            string? directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) 
+                Directory.CreateDirectory(directory);
+
+            // Check if file exists to determine if we need headers
+            bool fileExists = File.Exists(filePath);
+
+            await using var writer = new StreamWriter(filePath, true, Encoding.UTF8);
+            
+            // Get all public fields and properties of the struct
+            var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance);
+            var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            
+            // Write header if this is a new file
+            if (!fileExists)
+            {
+                var headers = fields.Select(f => f.Name)
+                                    .Concat(properties.Select(p => p.Name));
+                await writer.WriteLineAsync(string.Join(",", headers));
+            }
+
+            // Write all records
+            foreach (T record in records)
+            {
+                List<string> values = new List<string>();
+                
+                // Process fields
+                values.AddRange(fields.Select(field => field.GetValue(record)).Select(FormatValue).ToList());
+                
+                // Process properties
+                values.AddRange(properties.Select(property => property.GetValue(record)).Select(FormatValue));
+
+                await writer.WriteLineAsync(string.Join(",", values));
+            }
+        }
+        
+        private static async Task AppendRecordsToFileAsync<T>(T record, string fileName) where T : struct
         {
             string pluginPath = Path.Combine(Application.dataPath, "Plugins");
             string logsFolder = Path.Combine(pluginPath, "Logs");
@@ -43,28 +105,43 @@ namespace Scitalis.Analytics.FileWriter
 
                 await using var writer = new StreamWriter(filePath, true, Encoding.UTF8);
                 
+                // Get all public fields and properties of the struct
+                var fields = typeof(T).GetFields(BindingFlags.Public | BindingFlags.Instance);
+                var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                
                 // Write header if this is a new file
                 if (!fileExists)
-                    await writer.WriteLineAsync(PositionHeaderLine);
-
-                // Write all records
-                foreach (var record in records)
                 {
-                    string line = $"{EscapeCsv(record.TimeStamp)}," +
-                                  $"{EscapeCsv(record.PlayerName)}," +
-                                  $"{EscapeCsv(record.PlayerID)}," +
-                                  $"{record.PlayerPosition.X}," +
-                                  $"{record.PlayerPosition.Y}," +
-                                  $"{record.PlayerPosition.Z}";
-                    
-                    await writer.WriteLineAsync(line);
+                    var headers = fields.Select(f => f.Name)
+                                        .Concat(properties.Select(p => p.Name));
+                    await writer.WriteLineAsync(string.Join(",", headers));
                 }
+
+                List<string> values = new List<string>();
+                
+                values.AddRange(fields.Select(field => field.GetValue(record)).Select(FormatValue).ToList());
+                values.AddRange(properties.Select(property => property.GetValue(record)).Select(FormatValue));
+
+                await writer.WriteLineAsync(string.Join(",", values));
             }
             catch (Exception ex)
             {
                 Debug.LogError($"Error writing to file: {ex.Message}");
-                throw; // Re-throw to allow caller to handle the exception
+                throw;
             }
+        }
+        
+        private static string FormatValue(object? value)
+        {
+            return value switch
+            {
+                null => string.Empty,
+                // Handle special cases for complex types
+                Vector3 vector3 => $"({vector3.X};{vector3.Y};{vector3.Z})",
+                Dictionary<string, object> dictionary => EscapeCsv(JsonUtility.ToJson(dictionary)),
+                Enum enumValue => enumValue.ToString(),
+                _ => EscapeCsv(value.ToString())
+            };
         }
         
         private static string EscapeCsv(string input)
@@ -76,21 +153,6 @@ namespace Scitalis.Analytics.FileWriter
                 return $"\"{input.Replace("\"", "\"\"")}\"";
             
             return input;
-        }
-
-        
-        public async Task AppendPlayerPositionToFile(ICollection<UnturnedUser> users)
-        {
-            PlayerPositionRecord[] records = PlayerPositionRecords(users);
-            try
-            {
-                await AppendRecordsToFileAsync(records, PositionFileName);
-                Debug.Log("Records written successfully");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to write records: {ex.Message}");
-            }
         }
 
         private static PlayerPositionRecord[] PlayerPositionRecords(ICollection<UnturnedUser> users)
