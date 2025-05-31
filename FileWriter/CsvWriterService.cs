@@ -22,8 +22,8 @@ namespace Scitalis.Analytics.FileWriter
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton)]
     public class CsvWriterService : IWriterService
     {
-        private const string HeaderLine = "Timestamp,PlayerName,PlayerID,PositionX,PositionY,PositionZ";
-        private const string FileName = "player_position.csv";
+        private const string PositionHeaderLine = "Timestamp,PlayerName,PlayerID,PositionX,PositionY,PositionZ";
+        private const string PositionFileName = "player_position.csv";
 
         private static async Task AppendRecordsToFileAsync(PlayerPositionRecord[] records, string fileName = "PlayerPositions.csv")
         {
@@ -45,7 +45,7 @@ namespace Scitalis.Analytics.FileWriter
                 
                 // Write header if this is a new file
                 if (!fileExists)
-                    await writer.WriteLineAsync(HeaderLine);
+                    await writer.WriteLineAsync(PositionHeaderLine);
 
                 // Write all records
                 foreach (var record in records)
@@ -84,7 +84,7 @@ namespace Scitalis.Analytics.FileWriter
             PlayerPositionRecord[] records = PlayerPositionRecords(users);
             try
             {
-                await AppendRecordsToFileAsync(records, FileName);
+                await AppendRecordsToFileAsync(records, PositionFileName);
                 Debug.Log("Records written successfully");
             }
             catch (Exception ex)
