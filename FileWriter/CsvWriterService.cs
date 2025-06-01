@@ -43,15 +43,9 @@ namespace Scitalis.Analytics.FileWriter
         
         public async Task AppendToDamageFile(UnturnedPlayerDamagedEvent @event)
         {
-            KillFeedRecord record = new KillFeedRecord
-            {
-                KillerID = @event.Killer,
-                VictimID = @event.Player.SteamId,
-                HitLimb = @event.Limb,
-                DamageSource = @event.DamageSource,
-                DamageAmount = @event.DamageAmount,
-                Cause = @event.Cause,
-            };
+            KillFeedRecord record = new KillFeedRecord(killerID: @event.Killer, victimID: @event.Player.SteamId,
+                hitLimb: @event.Limb, damageSource: @event.DamageSource, damageAmount: @event.DamageAmount,
+                cause: @event.Cause);
             try
             {
                 await AppendRecordsToFileAsync(record, CombatFileName);
