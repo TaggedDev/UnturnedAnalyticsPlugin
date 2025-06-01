@@ -10,12 +10,12 @@ using Scitalis.Analytics.FileWriter;
 namespace Scitalis.Analytics.Logging
 {
     [ServiceImplementation(Lifetime = ServiceLifetime.Singleton)]
-    public class PlayerDamageFeed : IAnalyticsLogger, IEventListener<UnturnedPlayerDamagedEvent>
+    public class PlayerDamageLogger : IAnalyticsLogger, IEventListener<UnturnedPlayerDamagedEvent>
     {
-        private readonly ILogger<PlayerDamageFeed> _logger;
+        private readonly ILogger<PlayerDamageLogger> _logger;
         private readonly IWriterService _writer;
 
-        public PlayerDamageFeed(ILogger<PlayerDamageFeed> logger, IWriterService writer)
+        public PlayerDamageLogger(ILogger<PlayerDamageLogger> logger, IWriterService writer)
         {
             _logger = logger;
             _writer = writer;
