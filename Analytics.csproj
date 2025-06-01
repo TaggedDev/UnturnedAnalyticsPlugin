@@ -14,9 +14,10 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
-    <Version>0.2.0</Version>
-	<InformationalVersion>0.2.0</InformationalVersion>
-    <PackageVersion>0.2.0</PackageVersion>
+    <Version>0.2.4</Version>
+	<InformationalVersion>0.2.4</InformationalVersion>
+    <PackageVersion>0.2.4</PackageVersion>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +34,10 @@
 
   <ItemGroup>
     <Folder Include="Localization\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+	<None Include="README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

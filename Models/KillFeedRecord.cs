@@ -13,7 +13,5 @@ namespace Scitalis.Analytics.Models
         public IDamageSource? DamageSource;
         public byte DamageAmount;
         public EDeathCause Cause;
-        public Dictionary<string, object> Arguments;
-        public Dictionary<string, object> Data;
     }
 }
