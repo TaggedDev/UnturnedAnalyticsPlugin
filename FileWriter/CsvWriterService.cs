@@ -22,6 +22,7 @@ namespace Scitalis.Analytics.FileWriter
         private readonly ILogger<CsvWriterService> _logger;
         private const string PositionFileName = "player_position.csv";
         private const string CombatFileName = "player_combat.csv";
+        private const string KillFileName = "player_kill.csv";
 
         public CsvWriterService(ILogger<CsvWriterService> logger)
         {
@@ -43,7 +44,7 @@ namespace Scitalis.Analytics.FileWriter
         
         public async Task AppendToDamageFile(UnturnedPlayerDamagedEvent @event)
         {
-            KillFeedRecord record = new KillFeedRecord(killerID: @event.Killer, victimID: @event.Player.SteamId,
+            PlayerDamageRecord record = new PlayerDamageRecord(killerID: @event.Killer, victimID: @event.Player.SteamId,
                 hitLimb: @event.Limb, damageSource: @event.DamageSource, damageAmount: @event.DamageAmount,
                 cause: @event.Cause);
             try
@@ -55,7 +56,22 @@ namespace Scitalis.Analytics.FileWriter
                 _logger.LogInformation($"Error occured while trying to write kill feed: {e}");
             }
         }
-        
+
+        public async Task AppendToKillFeedFile(UnturnedPlayerDeathEvent @event)
+        {
+            PlayerKillRecord record = new PlayerKillRecord(killerID: @event.Instigator, victimID: @event.Player.SteamId,
+                hitLimb: @event.Limb, damageSource: @event, deathPosition: @event.DeathPosition,
+                cause: @event.DeathCause);
+            try
+            {
+                await AppendRecordsToFileAsync(record, KillFileName);
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation($"Error occured while trying to write kill feed: {e}");
+            }
+        }
+
         private async Task AppendRecordsToFileAsync<T>(T[] records, string fileName) where T : struct
         {
             try

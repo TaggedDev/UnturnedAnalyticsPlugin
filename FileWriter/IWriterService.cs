@@ -11,5 +11,6 @@ namespace Scitalis.Analytics.FileWriter
     {
         Task AppendToPlayerPositionFile(ICollection<UnturnedUser> users);
         Task AppendToDamageFile(UnturnedPlayerDamagedEvent @event);
+        Task AppendToKillFeedFile(UnturnedPlayerDeathEvent @event);
     }
 }

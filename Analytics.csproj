@@ -14,9 +14,9 @@
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
     <NoWarn>$(NoWarn);NU1701;NU1702;CS0436</NoWarn>
-    <Version>0.2.6</Version>
-	<InformationalVersion>0.2.6</InformationalVersion>
-    <PackageVersion>0.2.6</PackageVersion>
+    <Version>0.3.0</Version>
+	<InformationalVersion>0.3.0</InformationalVersion>
+    <PackageVersion>0.3.0</PackageVersion>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 

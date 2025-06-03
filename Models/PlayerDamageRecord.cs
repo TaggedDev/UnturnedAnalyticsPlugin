@@ -4,7 +4,7 @@ using Steamworks;
 
 namespace Scitalis.Analytics.Models
 {
-    public struct KillFeedRecord
+    public struct PlayerDamageRecord
     {
         public CSteamID KillerID;
         public CSteamID VictimID;
@@ -14,7 +14,7 @@ namespace Scitalis.Analytics.Models
         public EDeathCause Cause;
         public string DamageSourceName;
 
-        public KillFeedRecord(CSteamID killerID, CSteamID victimID, ELimb hitLimb, IDamageSource? damageSource, byte damageAmount, EDeathCause cause)
+        public PlayerDamageRecord(CSteamID killerID, CSteamID victimID, ELimb hitLimb, IDamageSource? damageSource, byte damageAmount, EDeathCause cause)
         {
             KillerID = killerID;
             VictimID = victimID;
