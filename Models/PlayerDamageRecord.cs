@@ -6,6 +6,7 @@ namespace Scitalis.Analytics.Models
 {
     public struct PlayerDamageRecord
     {
+        public string Timestamp;
         public CSteamID KillerID;
         public CSteamID VictimID;
         public ELimb HitLimb;
@@ -14,7 +15,7 @@ namespace Scitalis.Analytics.Models
         public EDeathCause Cause;
         public string DamageSourceName;
 
-        public PlayerDamageRecord(CSteamID killerID, CSteamID victimID, ELimb hitLimb, IDamageSource? damageSource, byte damageAmount, EDeathCause cause)
+        public PlayerDamageRecord(CSteamID killerID, CSteamID victimID, ELimb hitLimb, IDamageSource? damageSource, byte damageAmount, EDeathCause cause, string timestamp)
         {
             KillerID = killerID;
             VictimID = victimID;
@@ -22,6 +23,7 @@ namespace Scitalis.Analytics.Models
             DamageSource = damageSource;
             DamageAmount = damageAmount;
             Cause = cause;
+            Timestamp = timestamp;
             DamageSourceName = damageSource is null ? string.Empty : damageSource.DamageSourceName;
         }
 

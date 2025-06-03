@@ -12,10 +12,11 @@ namespace Scitalis.Analytics.FileWriter
         public ELimb HitLimb;
         public UnturnedPlayerDeathEvent DamageSource;
         public Vector3 DeathPosition;
+        public string TimeStamp;
         public EDeathCause Cause;
 
         public PlayerKillRecord(CSteamID killerID, CSteamID victimID, ELimb hitLimb, 
-            UnturnedPlayerDeathEvent damageSource, Vector3 deathPosition, EDeathCause cause)
+            UnturnedPlayerDeathEvent damageSource, Vector3 deathPosition, EDeathCause cause, string timeStamp)
         {
             KillerID = killerID;
             VictimID = victimID;
@@ -23,6 +24,7 @@ namespace Scitalis.Analytics.FileWriter
             DamageSource = damageSource;
             DeathPosition = deathPosition;
             Cause = cause;
+            TimeStamp = timeStamp;
         }
     }
 }

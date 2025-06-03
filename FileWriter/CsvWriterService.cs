@@ -44,9 +44,10 @@ namespace Scitalis.Analytics.FileWriter
         
         public async Task AppendToDamageFile(UnturnedPlayerDamagedEvent @event)
         {
+            string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             PlayerDamageRecord record = new PlayerDamageRecord(killerID: @event.Killer, victimID: @event.Player.SteamId,
                 hitLimb: @event.Limb, damageSource: @event.DamageSource, damageAmount: @event.DamageAmount,
-                cause: @event.Cause);
+                cause: @event.Cause, timeStamp);
             try
             {
                 await AppendRecordsToFileAsync(record, CombatFileName);
@@ -59,9 +60,10 @@ namespace Scitalis.Analytics.FileWriter
 
         public async Task AppendToKillFeedFile(UnturnedPlayerDeathEvent @event)
         {
+            string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             PlayerKillRecord record = new PlayerKillRecord(killerID: @event.Instigator, victimID: @event.Player.SteamId,
                 hitLimb: @event.Limb, damageSource: @event, deathPosition: @event.DeathPosition,
-                cause: @event.DeathCause);
+                cause: @event.DeathCause, timeStamp);
             try
             {
                 await AppendRecordsToFileAsync(record, KillFileName);
